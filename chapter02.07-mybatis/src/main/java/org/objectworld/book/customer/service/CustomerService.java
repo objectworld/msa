@@ -1,0 +1,62 @@
+package org.objectworld.book.customer.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.objectworld.book.customer.domain.Customer;
+import org.objectworld.book.customer.repository.CustomerMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+public class CustomerService {
+    private final Logger log = LoggerFactory.getLogger(CustomerService.class);
+
+    private final CustomerMapper customerRepository;
+
+    public CustomerService(CustomerMapper customerRepository) {
+    	this.customerRepository = customerRepository;
+    }
+    
+    public Customer create(Customer customer) {
+        log.debug("Request to create Customer : {}", customer);
+        this.customerRepository.insert(customer);
+        return customer;
+    }
+
+    public List<Customer> findAll() {
+        log.debug("Request to get all Customers");
+        return this.customerRepository.findAll()
+                .stream()
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Customer findById(Long id) {
+        log.debug("Request to get Customer : {}", id);
+        return this.customerRepository.findById(id).get();
+    }
+
+    public List<Customer> findAllActive() {
+        log.debug("Request to get all Customers");
+        return this.customerRepository.findAllByEnabled(true);
+    }
+
+    public List<Customer> findAllInactive() {
+        log.debug("Request to get all Customers");
+        return this.customerRepository.findAllByEnabled(false);
+    }
+
+    public void delete(Long id) {
+        log.debug("Request to delete Customer : {}", id);
+
+        Customer customer = this.customerRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Cannot find Customer with id " + id));
+
+        customer.setEnabled(false);
+        this.customerRepository.update(customer);
+    }
+}

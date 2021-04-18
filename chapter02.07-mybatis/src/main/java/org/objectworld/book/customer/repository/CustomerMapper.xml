@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.objectworld.book.customer.repository.CustomerMapper">
+    <select id="getId" resultType="long">
+        select hibernate_sequence.nextval from dual
+    </select>
+	
+    <insert id="insert" parameterType="customer">
+      	<selectKey keyProperty="id" resultType="long" order="BEFORE">
+    		select hibernate_sequence.nextval from dual
+  		</selectKey>
+    	insert into customers 
+			(created_date, last_modified_date, email, enabled, first_name, last_name, telephone, id)
+		values 
+			(#{createdDate}, #{lastModifiedDate}, #{email}, #{enabled}, #{firstName}, #{lastName}, #{telephone}, #{id})
+    </insert>
+
+
+    <update id="update">
+      	update customers set
+			created_date = #{createdDate} 
+			, last_modified_date = #{lastModifiedDate} 
+			, email = #{email} 
+			, enabled = #{enabled} 
+			, first_name = #{firstName} 
+			, last_name = #{lastName} 
+			, telephone = #{telephone} 
+		where id = #{id}
+    </update>
+	
+    <select id="findById" resultType="customer">
+        select 
+        	id
+        	, created_date as createdDate
+        	, last_modified_date as lastModifiedDate
+        	, email
+        	, enabled
+        	, first_name as firstName
+        	, last_name as lastName
+        	, telephone
+		from customers
+		where id = #{id}
+    </select>
+
+    <select id="findAll" resultType="customer">
+        select
+        	id
+        	, created_date as createdDate
+        	, last_modified_date as lastModifiedDate
+        	, email
+        	, enabled
+        	, first_name as firstName
+        	, last_name as lastName
+        	, telephone
+		from customers
+    </select>
+
+    <select id="findAllByEnabled" resultType="customer">
+        select
+        	id
+        	, created_date as createdDate
+        	, last_modified_date as lastModifiedDate
+        	, email
+        	, enabled
+        	, first_name as firstName
+        	, last_name as lastName
+        	, telephone
+		from customers
+		where enabled = #{enabled}
+    </select>
+</mapper>
