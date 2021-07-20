@@ -26,7 +26,7 @@
 
 		<!-- groovy -->
 		<gmavenplus-plugin-version>1.6.2</gmavenplus-plugin-version>
-		<groovy-version>2.5.8</groovy-version>
+		<groovy-version>[2.5.14,)</groovy-version>
 		<groovy-eclipse-compiler-version>3.6.0-01</groovy-eclipse-compiler-version>
 		<groovy-eclipse-batch-version>2.5.8-02</groovy-eclipse-batch-version>
 				
