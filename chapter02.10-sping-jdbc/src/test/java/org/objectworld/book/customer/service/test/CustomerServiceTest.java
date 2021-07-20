@@ -2,23 +2,19 @@ package org.objectworld.book.customer.service.test;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.runner.RunWith;
 import org.objectworld.book.customer.domain.Customer;
 import org.objectworld.book.customer.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.extern.slf4j.Slf4j;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @Rollback(false)
 @Slf4j
@@ -83,7 +79,7 @@ class CustomerServiceTest {
 	}
 	
 	@Test
-	@Order(5)
+	@Order(6)
 //	@Disabled
 	public void findAllActive() {
 		List<Customer> customerList = customerService.findAllActive();

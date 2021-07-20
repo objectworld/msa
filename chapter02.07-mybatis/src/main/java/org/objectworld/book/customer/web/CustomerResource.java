@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/customers")
 public class CustomerResource {
-
     private final CustomerService customerService;
 
     public CustomerResource(CustomerService customerService) {

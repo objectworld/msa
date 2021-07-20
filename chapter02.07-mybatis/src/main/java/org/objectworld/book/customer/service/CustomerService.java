@@ -10,11 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Transactional
+@Slf4j
 public class CustomerService {
-    private final Logger log = LoggerFactory.getLogger(CustomerService.class);
-
     private final CustomerMapper customerRepository;
 
     public CustomerService(CustomerMapper customerRepository) {

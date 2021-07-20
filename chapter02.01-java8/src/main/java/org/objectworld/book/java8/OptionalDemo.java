@@ -18,7 +18,7 @@ public class OptionalDemo {
 		};
 		List<Integer> myList = Arrays.asList(numbers);
 		
-		// null 이면 -1을 프린트
+		// Optional을 사용하여 Integer List 중 null값이 있으면 -1로 대체하는 람다 표현식
 		Numbers myNumber = (numberList) -> numberList.forEach((number) -> 
 			System.out.println(Optional.ofNullable(number).map(Integer::new).orElse(-1)));
 		

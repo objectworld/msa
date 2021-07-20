@@ -14,6 +14,7 @@ public class MethodReferenceDemo {
 		};
 		List<Integer> myList = Arrays.asList(numbers);
 		
+		// Integer List를 프린트하는 메소드 참조 람다 표현식
 		Numbers myNumber = (numberList) -> numberList.forEach(System.out::println);
 		myNumber.printList(myList);
 	}

@@ -12,7 +12,8 @@ public class InterfaceDemo {	public interface Numbers {
 				6, 5, 4, 3, 2, 1
 		};
 		List<Integer> myList = Arrays.asList(numbers);
-
+		
+		// Interger List를 프린트하는 익명 클래스
 		Numbers myNumber = new Numbers() {
 			@Override 
 			public void printList(List<Integer> numberList) {

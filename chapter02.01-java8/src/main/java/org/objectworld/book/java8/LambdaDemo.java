@@ -14,6 +14,7 @@ public class LambdaDemo {
 		};
 		List<Integer> myList = Arrays.asList(numbers);
 		
+		// Integer List를 프린트하는 람다 표현식
 		Numbers myNumber = (numberList) -> numberList.forEach(number -> System.out.println(number));
 		myNumber.printList(myList);
 	}

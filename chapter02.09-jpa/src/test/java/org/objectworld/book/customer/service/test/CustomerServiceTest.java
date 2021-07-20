@@ -79,7 +79,7 @@ class CustomerServiceTest {
 	}
 	
 	@Test
-	@Order(5)
+	@Order(6)
 //	@Disabled
 	public void findAllActive() {
 		List<Customer> customerList = customerService.findAllActive();

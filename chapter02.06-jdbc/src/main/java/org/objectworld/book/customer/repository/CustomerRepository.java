@@ -30,6 +30,7 @@ public class CustomerRepository {
 	@Value("${spring.datasource.password}")
 	private String password;
 	
+	// JDBC Connection 연결
 	private Connection getConnection() throws ClassNotFoundException, SQLException {
 		Class.forName(driverClass);
 		Connection con = DriverManager.getConnection(url, userName, password);

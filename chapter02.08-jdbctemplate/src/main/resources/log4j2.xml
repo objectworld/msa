@@ -2,7 +2,7 @@
 <Configuration monitorInterval="30" status="WARN">
 	<Properties>
 		<Property name="LOG_PATTERN">
-			[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-10.-10t(%T)][%-5level][%c{1.}:%M(%L)] %msg%n%throwable
+			[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-10.-10t(%T)][%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue}][%c{1.}:%M(%L)] %msg%n%throwable
 		</Property>
 	</Properties>
 	<Appenders>

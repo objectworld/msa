@@ -2,28 +2,34 @@
 <Configuration monitorInterval="30" status="WARN">
 	<Properties>
 		<Property name="LOG_PATTERN">
-			[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-10.-10t(%T)][%-5level][%c{1.}:%M(%L)] %msg%n%throwable
+			[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-10.-10t(%T)][%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue}][%c{1.}:%M(%L)] %msg%n%throwable
 		</Property>
 	</Properties>
 	<Appenders>
+		<!-- 화면 출력을 위한 로그 설정 -->
 		<Console follow="true" name="ConsoleAppender" target="SYSTEM_OUT">
-			<PatternLayout pattern="${LOG_PATTERN}" />
+			<PatternLayout pattern="${LOG_PATTERN}" disableAnsi="false"/>
 		</Console>
+		<!-- 잦은 File I/O 로깅으로 인한 성능 저하를 방지하기 위하여 비동기 로깅을 위한 설정 -->
 		<Async name="AsyncRollingAppender" bufferSize="200">
 			<AppenderRef ref="RollingAppender" />
 		</Async>
+		<!-- 파일 출력을 위한 로그 설정. filePattern은 Rolling되었을 경우의 파일 생성 규칙 -->
 		<RollingFile name="RollingAppender"
 				fileName="logs/customer.log"
 				filePattern="logs/customer-%d{yyyy-MM-DD-HH}-%02i.log.gz" append="true"
 				ignoreExceptions="false">
 			<PatternLayout>
 				<Pattern>${LOG_PATTERN}</Pattern>
+				<disableAnsi>false</disableAnsi>
 			</PatternLayout>
+			<!-- 40MB가 넘으면 기존 파일을 백업 및 압축하고 새로운 파일로 생성하는 정책 -->
 			<Policies>
 				<OnStartupTriggeringPolicy />
 				<SizeBasedTriggeringPolicy size="40MB" />
 				<TimeBasedTriggeringPolicy />
 			</Policies>
+			<!-- logs/customer.*.log.gz 파일 중에서 60일이 지난 파일은 삭제하는 전략 -->
 			<DefaultRolloverStrategy>
 				<Delete basePath="${baseDir}" maxDepth="2">
 					<IfFileName glob="logs/customer.*.log.gz" />
@@ -33,24 +39,12 @@
 		</RollingFile>
 	</Appenders>
 	<Loggers>
+		<!-- org.objectworld 패키지 하위의 모든 클래스는 TRACE 레벨로 로깅 -->
 		<Logger additivity="false" level="TRACE" name="org.objectworld">
 			<AppenderRef ref="ConsoleAppender" />
   			<AppenderRef ref="AsyncRollingAppender" />
 		</Logger>
-		<Logger additivity="false" level="INFO" name="log4jdbc.log4j2">
-			<Filters>
-				<MarkerFilter marker="LOG4JDBC_SQL" onMatch="ACCEPT" onMismatch="NEUTRAL" />
-				<MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="NEUTRAL" />
-				<MarkerFilter marker="LOG4JDBC_CONNECTION" onMatch="DENY" onMismatch="NEUTRAL" />
-				<MarkerFilter marker="LOG4JDBC_JDBC" onMatch="DENY" onMismatch="NEUTRAL" />
-				<!-- <MarkerFilter marker="LOG4JDBC_SQL" onMatch="DENY" onMismatch="NEUTRAL"/> 
-					<MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="DENY" onMismatch="NEUTRAL"/> 
-					<MarkerFilter marker="LOG4JDBC_CONNECTION" onMatch="DENY" onMismatch="NEUTRAL"/> 
-					<MarkerFilter marker="LOG4JDBC_JDBC" onMatch="DENY" onMismatch="NEUTRAL"/> -->
-			</Filters>
-			<AppenderRef ref="ConsoleAppender" />
-  			<AppenderRef ref="AsyncRollingAppender" />
-		</Logger>
+		<!-- 디폴트 로깅은 INFO -->
 		<Root level="INFO">
 			<AppenderRef ref="ConsoleAppender" />
   			<AppenderRef ref="AsyncRollingAppender" />

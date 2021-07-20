@@ -8,7 +8,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.runner.RunWith;
 import org.objectworld.book.customer.domain.Customer;
 import org.objectworld.book.customer.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.extern.slf4j.Slf4j;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @Rollback(false)
 @Slf4j
@@ -89,7 +87,7 @@ class CustomerServiceTest {
 	}
 	
 	@Test
-	@Order(5) 
+	@Order(6) 
 	@DisplayName("Select Enabled Test")
 //	@Disabled
 	public void findAllActive() {

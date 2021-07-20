@@ -5,6 +5,7 @@ import java.util.List;
 
 public class DefaultMethodDemo {
 	public interface Numbers {
+		// 인터페이스 기본 메소드
 		default public void introduce() {
 			System.out.println("Let's print nubmers");
 		}

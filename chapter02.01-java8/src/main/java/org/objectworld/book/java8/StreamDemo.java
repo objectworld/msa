@@ -18,6 +18,7 @@ public class StreamDemo {
 		};
 		List<Integer> myList = Arrays.asList(numbers);
 		
+		// 스트림 API를 이용하여 lessThan보다 작은 Integer List만을 프린트하는 람다 표현식
 		Numbers myNumber = (numberList, lessThan) -> {
 			Stream<Integer> filteredList = numberList.stream().filter(
 					numberStream -> (numberStream.compareTo(lessThan) < 0));
