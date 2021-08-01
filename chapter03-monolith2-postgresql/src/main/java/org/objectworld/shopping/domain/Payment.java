@@ -30,7 +30,7 @@ public class Payment extends AbstractEntity {
     private PaymentStatus status;
 
     @OneToOne
-    @JoinColumn(name="order_id", unique = true)
+    @JoinColumn(unique = true)
     private Order order;
 
     public Payment(String paypalPaymentId, @NotNull PaymentStatus status, Order order) {

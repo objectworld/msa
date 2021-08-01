@@ -44,7 +44,7 @@ public class OrderService {
                     order.getTotalPrice(),
                     order.getStatus().name(),
                     order.getShipped(),
-                    order.getPayment() == null ? null : order.getPayment().getId(),
+                    order.getPayment().getId(),
                     AddressService.mapToDto(order.getShipmentAddress()),
                     orderItems
             );

@@ -45,11 +45,6 @@ public class Order extends AbstractEntity {
     private ZonedDateTime shipped;
 
     @OneToOne
-    @JsonIgnore
-    @JoinColumn(name="cart_id", unique = true)
-    private Cart cart;
-
-    @OneToOne(mappedBy="order")
     @JoinColumn(unique = true)
     private Payment payment;
 
@@ -59,6 +54,10 @@ public class Order extends AbstractEntity {
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<OrderItem> orderItems;
+
+    @OneToOne
+    @JsonIgnore
+    private Cart cart;
 
     public Order(@NotNull BigDecimal totalPrice, @NotNull OrderStatus status,
                  ZonedDateTime shipped, Payment payment, Address shipmentAddress,
