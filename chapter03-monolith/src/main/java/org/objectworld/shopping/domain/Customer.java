@@ -1,17 +1,24 @@
 package org.objectworld.shopping.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Set;
 
+import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
-import java.util.Objects;
-import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * A Customer.
@@ -19,10 +26,16 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of= {"firstName", "lastName", "email", "telephone"}, callSuper=true)
+@ToString(callSuper=true)
+@Builder
 @Entity
 @Table(name = "customers")
 public class Customer extends AbstractEntity {
 
+    private static final long serialVersionUID = 1L;
+    
     @Column(name = "first_name")
     private String firstName;
 
@@ -40,45 +53,22 @@ public class Customer extends AbstractEntity {
     @JsonIgnore
     private Set<Cart> carts;
 
+    @Embedded
+    @AttributeOverride(name = "address1", column = @Column(name = "home_address_1"))
+    @AttributeOverride(name = "address2", column = @Column(name = "home_address_2"))
+    @AttributeOverride(name = "city", column = @Column(name = "home_city"))
+    @AttributeOverride(name = "country", column = @Column(name = "home_country"))
+    @AttributeOverride(name = "postcode", column = @Column(name = "home_postcode"))
+    private Address homeAddress;
+    
+    @Embedded
+    @AttributeOverride(name = "address1", column = @Column(name = "office_address_1"))
+    @AttributeOverride(name = "address2", column = @Column(name = "office_address_2"))
+    @AttributeOverride(name = "city", column = @Column(name = "office_city"))
+    @AttributeOverride(name = "country", column = @Column(name = "office_country"))
+    @AttributeOverride(name = "postcode", column = @Column(name = "office_postcode"))
+    private Address officeAddress;
+    
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
-
-    public Customer(String firstName, String lastName, @Email String email,
-                    String telephone, Set<Cart> carts, Boolean enabled) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.telephone = telephone;
-        this.carts = carts;
-        this.enabled = enabled;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Customer customer = (Customer) o;
-        return Objects.equals(firstName, customer.firstName) &&
-                Objects.equals(lastName, customer.lastName) &&
-                Objects.equals(email, customer.email) &&
-                Objects.equals(telephone, customer.telephone) &&
-                Objects.equals(carts, customer.carts) &&
-                Objects.equals(enabled, customer.enabled);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(firstName, lastName, email, telephone, enabled);
-    }
-
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", telephone='" + telephone + '\'' +
-                ", enabled=" + enabled +
-                '}';
-    }
 }

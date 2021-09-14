@@ -1,15 +1,18 @@
-package org.objectworld.shopping.web.dto;
+package org.objectworld.shopping.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-/**
- * @author Nebrass Lamouchi
- */
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Builder
 public class CartDto {
     private Long id;
     private Long customerId;

@@ -1,15 +1,18 @@
 package org.objectworld.shopping.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * A OrderItem.
@@ -17,41 +20,25 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of={"quantity", "product", "order"}, callSuper=true)
+@Builder
 @Entity
 @Table(name = "order_items")
 public class OrderItem extends AbstractEntity {
 
+    private static final long serialVersionUID = 1L;
+    
     @NotNull
     @Column(name = "quantity", nullable = false)
     private Long quantity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Order order;
-
-    public OrderItem(@NotNull Long quantity, Product product, Order order) {
-        this.quantity = quantity;
-        this.product = product;
-        this.order = order;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OrderItem orderItem = (OrderItem) o;
-        return Objects.equals(quantity, orderItem.quantity) &&
-                Objects.equals(product, orderItem.product) &&
-                Objects.equals(order, orderItem.order);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(quantity, product, order);
-    }
-
+    
     @Override
     public String toString() {
         return "OrderItem{" +

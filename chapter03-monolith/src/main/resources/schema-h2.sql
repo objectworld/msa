@@ -31,7 +31,17 @@ create table "customers"
     "enabled"            boolean   not null,
     "first_name"         varchar(255),
     "last_name"          varchar(255),
-    "telephone"          varchar(255)
+    "telephone"          varchar(255),
+	"home_address_1"	 varchar(255),
+	"home_address_2"     varchar(255),
+    "home_city"          varchar(255),
+    "home_country"       varchar(2),
+    "home_postcode"      varchar(10),
+	"office_address_1"	 varchar(255),
+	"office_address_2"   varchar(255),
+    "office_city"        varchar(255),
+    "office_country"     varchar(2),
+    "office_postcode"    varchar(10)
 );
 alter table "customers"
     add constraint "customer_pk" primary key ("id");
@@ -60,7 +70,7 @@ create table "orders"
     "postcode"           varchar(10),
     "shipped"            timestamp,
     "status"             varchar(255)   not null,
-    "total_price"        decimal(10, 2) not null,
+    "total_price"        decimal(10, 2) not null default 0,
     "cart_id"            bigint
 );
 alter table "orders"

@@ -1,7 +1,7 @@
 package org.objectworld.shopping.web;
 
+import org.objectworld.shopping.dto.ProductDto;
 import org.objectworld.shopping.service.ProductService;
-import org.objectworld.shopping.web.dto.ProductDto;
 import org.springframework.web.bind.annotation.*;
 
 import static org.objectworld.shopping.common.Web.API;

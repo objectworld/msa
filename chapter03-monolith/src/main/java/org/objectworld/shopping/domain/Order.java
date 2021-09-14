@@ -1,22 +1,32 @@
 package org.objectworld.shopping.domain;
 
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.objectworld.shopping.domain.enumeration.OrderStatus;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
-import org.objectworld.shopping.domain.enumeration.OrderStatus;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * A Orders.
@@ -24,8 +34,10 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of= {"totalPrice", "status", "shipped", "payment", "shipmentAddress", "cart"}, callSuper=true)
+@AllArgsConstructor
+@EqualsAndHashCode(of={"totalPrice", "status", "shipped", "payment", "shipmentAddress", "cart"}, callSuper=true)
 @ToString(callSuper=true)
+@Builder
 @Entity
 @Table(name = "orders")
 public class Order extends AbstractEntity {
@@ -50,7 +62,6 @@ public class Order extends AbstractEntity {
     private Cart cart;
 
     @OneToOne(mappedBy="order")
-    @JoinColumn(unique = true)
     private Payment payment;
 
     @Embedded
@@ -59,16 +70,4 @@ public class Order extends AbstractEntity {
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<OrderItem> orderItems;
-
-    public Order(@NotNull BigDecimal totalPrice, @NotNull OrderStatus status,
-                 ZonedDateTime shipped, Payment payment, Address shipmentAddress,
-                 Set<OrderItem> orderItems, Cart cart) {
-        this.totalPrice = totalPrice;
-        this.status = status;
-        this.shipped = shipped;
-        this.payment = payment;
-        this.shipmentAddress = shipmentAddress;
-        this.orderItems = orderItems;
-        this.cart = cart;
-    }
 }

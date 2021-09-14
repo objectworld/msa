@@ -1,7 +1,7 @@
 package org.objectworld.shopping.web;
 
+import org.objectworld.shopping.dto.ReviewDto;
 import org.objectworld.shopping.service.ReviewService;
-import org.objectworld.shopping.web.dto.ReviewDto;
 import org.springframework.web.bind.annotation.*;
 
 import static org.objectworld.shopping.common.Web.API;
@@ -33,7 +33,7 @@ public class ReviewResource {
 
     @PostMapping
     public ReviewDto create(@RequestBody ReviewDto reviewDto) {
-        return this.reviewService.createDto(reviewDto);
+        return this.reviewService.create(reviewDto);
     }
 
     @DeleteMapping("/{id}")

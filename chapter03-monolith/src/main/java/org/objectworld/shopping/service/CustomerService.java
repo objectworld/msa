@@ -1,22 +1,21 @@
 package org.objectworld.shopping.service;
 
-import org.objectworld.shopping.domain.Customer;
-import org.objectworld.shopping.repository.CustomerRepository;
-import org.objectworld.shopping.web.dto.CustomerDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.objectworld.shopping.domain.Customer;
+import org.objectworld.shopping.dto.CustomerDto;
+import org.objectworld.shopping.repository.CustomerRepository;
+import org.objectworld.util.ObjectMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Transactional
+@Slf4j
 public class CustomerService {
-    private final Logger log = LoggerFactory.getLogger(CustomerService.class);
-
     private final CustomerRepository customerRepository;
 
     public CustomerService(CustomerRepository customerRepository) {
@@ -24,34 +23,38 @@ public class CustomerService {
     }
 
     public static CustomerDto mapToDto(Customer customer) {
-        if (customer != null) {
-            return new CustomerDto(
-                    customer.getId(),
-                    customer.getFirstName(),
-                    customer.getLastName(),
-                    customer.getEmail(),
-                    customer.getTelephone()
-            );
-        }
-        return null;
+//    	if(customer != null) {
+//	    	return CustomerDto.builder()
+//	    			.id(customer.getId())
+//	    			.firstName(customer.getFirstName())
+//	    			.lastName(customer.getLastName())
+//	                .email(customer.getEmail())
+//	                .telephone(customer.getTelephone())
+//	                .homeAddress(AddressService.mapToDto(customer.getHomeAddress()))
+//	                .officeAddress(AddressService.mapToDto(customer.getOfficeAddress()))
+//	                .enabled(customer.getEnabled())
+//	                .build();
+//    	} else {
+//    		return null;
+//    	}
+    	return ObjectMapper.map(customer, CustomerDto.class);
     }
 
-    public CustomerDto create(CustomerDto customerDto) {
-        log.debug("Request to create Customer : {}", customerDto);
-        return mapToDto(
-                this.customerRepository.save(
-                        new Customer(
-                                customerDto.getFirstName(),
-                                customerDto.getLastName(),
-                                customerDto.getEmail(),
-                                customerDto.getTelephone(),
-                                Collections.emptySet(),
-                                Boolean.TRUE
-                        )
-                )
-        );
+    public static Customer createFromDto(CustomerDto customerDto) {
+//        return Customer.builder()
+//            	.firstName(customerDto.getFirstName())
+//            	.lastName(customerDto.getLastName())
+//                .email(customerDto.getEmail())
+//                .telephone(customerDto.getTelephone())
+//                .homeAddress(AddressService.createFromDto(customerDto.getHomeAddress()))
+//                .officeAddress(AddressService.createFromDto(customerDto.getOfficeAddress()))
+//                .carts(Collections.emptySet())
+//                .enabled(Boolean.TRUE)
+//                .build();
+        return ObjectMapper.map(customerDto, Customer.class);
     }
-
+    
+    @Transactional(readOnly = true)
     public List<CustomerDto> findAll() {
         log.debug("Request to get all Customers");
         return this.customerRepository.findAll()
@@ -63,30 +66,38 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public CustomerDto findById(Long id) {
         log.debug("Request to get Customer : {}", id);
-        return this.customerRepository.findById(id).map(CustomerService::mapToDto).orElse(null);
+        return this.customerRepository.findById(id)
+        		.map(CustomerService::mapToDto).orElse(null);
     }
 
+    @Transactional(readOnly = true)
     public List<CustomerDto> findAllActive() {
-        log.debug("Request to get all Customers");
+        log.debug("Request to get all active Customers");
         return this.customerRepository.findAllByEnabled(true)
                 .stream()
                 .map(CustomerService::mapToDto)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<CustomerDto> findAllInactive() {
-        log.debug("Request to get all Customers");
+        log.debug("Request to get all inactive Customers");
         return this.customerRepository.findAllByEnabled(false)
                 .stream()
                 .map(CustomerService::mapToDto)
                 .collect(Collectors.toList());
     }
 
+    public CustomerDto create(CustomerDto customerDto) {
+        log.debug("Request to create Customer : {}", customerDto);
+        return mapToDto(this.customerRepository.save(createFromDto(customerDto)));
+    }
+
     public void delete(Long id) {
         log.debug("Request to delete Customer : {}", id);
 
         Customer customer = this.customerRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("Cannot find Customer with id " + id));
+                .orElseThrow(() -> new IllegalStateException("Cannot find Customer id : " + id));
 
         customer.setEnabled(false);
         this.customerRepository.save(customer);

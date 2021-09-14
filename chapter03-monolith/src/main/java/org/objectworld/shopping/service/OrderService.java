@@ -1,29 +1,23 @@
 package org.objectworld.shopping.service;
 
-import org.objectworld.shopping.domain.Address;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.objectworld.shopping.domain.Cart;
 import org.objectworld.shopping.domain.Order;
-import org.objectworld.shopping.domain.enumeration.OrderStatus;
+import org.objectworld.shopping.dto.OrderDto;
+import org.objectworld.shopping.repository.CartRepository;
 import org.objectworld.shopping.repository.OrderRepository;
-import org.objectworld.shopping.web.dto.OrderDto;
-import org.objectworld.shopping.web.dto.OrderItemDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.objectworld.util.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
+@Slf4j
 public class OrderService {
-
-    private final Logger log = LoggerFactory.getLogger(OrderService.class);
-
     private final OrderRepository orderRepository;
 
     public OrderService(OrderRepository orderRepository) {
@@ -31,27 +25,14 @@ public class OrderService {
     }
 
     public static OrderDto mapToDto(Order order) {
-        if (order != null) {
-
-            Set<OrderItemDto> orderItems = order
-                    .getOrderItems()
-                    .stream()
-                    .map(OrderItemService::mapToDto)
-                    .collect(Collectors.toSet());
-
-            return new OrderDto(
-                    order.getId(),
-                    order.getTotalPrice(),
-                    order.getStatus().name(),
-                    order.getShipped(),
-                    order.getPayment() == null ? null : order.getPayment().getId(),
-                    AddressService.mapToDto(order.getShipmentAddress()),
-                    orderItems
-            );
-        }
-        return null;
+    	return ObjectMapper.map(order, OrderDto.class);
     }
 
+    public static Order createFromDto(OrderDto orderDto) {
+		return ObjectMapper.map(orderDto, Order.class);
+	}
+	
+    @Transactional(readOnly = true)
     public List<OrderDto> findAll() {
         log.debug("Request to get all Orders");
         return this.orderRepository.findAll()
@@ -63,11 +44,14 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderDto findById(Long id) {
         log.debug("Request to get Order : {}", id);
-        return this.orderRepository.findById(id).map(OrderService::mapToDto).orElse(null);
+        return this.orderRepository.findById(id)
+        		.map(OrderService::mapToDto).orElse(null);
     }
 
-    public List<OrderDto> findAllByUser(Long id) {
-        return this.orderRepository.findByCartCustomer_Id(id)
+    @Transactional(readOnly = true)
+    public List<OrderDto> findAllByCustomerId(Long customerId) {
+        log.debug("Request to get Order with Customer : {}", customerId);
+        return this.orderRepository.findByCartCustomerId(customerId)
                 .stream()
                 .map(OrderService::mapToDto)
                 .collect(Collectors.toList());
@@ -75,34 +59,7 @@ public class OrderService {
 
     public OrderDto create(OrderDto orderDto) {
         log.debug("Request to create Order : {}", orderDto);
-        return mapToDto(
-                this.orderRepository.save(
-                        new Order(
-                                BigDecimal.ZERO,
-                                OrderStatus.CREATION,
-                                null,
-                                null,
-                                AddressService.createFromDto(orderDto.getShipmentAddress()),
-                                Collections.emptySet(),
-                                null
-                        )
-                )
-        );
-    }
-
-    public Order create(Cart cart, Address address) {
-        log.debug("Request to create Order with a Cart : {}", cart);
-        return this.orderRepository.save(
-                new Order(
-                        BigDecimal.ZERO,
-                        OrderStatus.CREATION,
-                        null,
-                        null,
-                        address,
-                        Collections.emptySet(),
-                        cart
-                )
-        );
+        return mapToDto(this.orderRepository.save(createFromDto(orderDto)));
     }
 
     public void delete(Long id) {

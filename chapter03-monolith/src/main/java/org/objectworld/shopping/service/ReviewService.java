@@ -1,21 +1,21 @@
 package org.objectworld.shopping.service;
 
-import org.objectworld.shopping.domain.Review;
-import org.objectworld.shopping.repository.ReviewRepository;
-import org.objectworld.shopping.web.dto.ReviewDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.objectworld.shopping.domain.Review;
+import org.objectworld.shopping.dto.ReviewDto;
+import org.objectworld.shopping.repository.ReviewRepository;
+import org.objectworld.util.ObjectMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Transactional
+@Slf4j
 public class ReviewService {
-    private final Logger log = LoggerFactory.getLogger(ReviewService.class);
-
     private final ReviewRepository reviewRepository;
 
     public ReviewService(ReviewRepository reviewRepository) {
@@ -23,17 +23,14 @@ public class ReviewService {
     }
 
     public static ReviewDto mapToDto(Review review) {
-        if (review != null) {
-            return new ReviewDto(
-                    review.getId(),
-                    review.getTitle(),
-                    review.getDescription(),
-                    review.getRating()
-            );
-        }
-        return null;
+    	return ObjectMapper.map(review, ReviewDto.class);
     }
 
+    public Review createFromDto(ReviewDto reviewDto) {
+        return ObjectMapper.map(reviewDto, Review.class);
+    }
+
+    @Transactional(readOnly = true)
     public List<ReviewDto> findAll() {
         log.debug("Request to get all Reviews");
         return this.reviewRepository.findAll()
@@ -45,22 +42,13 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public ReviewDto findById(Long id) {
         log.debug("Request to get Review : {}", id);
-        return this.reviewRepository.findById(id).map(ReviewService::mapToDto).orElse(null);
+        return this.reviewRepository.findById(id)
+        	.map(ReviewService::mapToDto).orElse(null);
     }
 
-    public ReviewDto createDto(ReviewDto reviewDto) {
-        log.debug("Request to create Review : {}", reviewDto);
-        return mapToDto(create(reviewDto));
-    }
-
-    public Review create(ReviewDto reviewDto) {
-        return this.reviewRepository.save(
-                new Review(
-                        reviewDto.getTitle(),
-                        reviewDto.getDescription(),
-                        reviewDto.getRating()
-                )
-        );
+    public ReviewDto create(ReviewDto reviewDto) {
+        log.debug("Request to create Review : {}", reviewDto);    	
+        return mapToDto(this.reviewRepository.save(createFromDto(reviewDto)));
     }
 
     public void delete(Long id) {

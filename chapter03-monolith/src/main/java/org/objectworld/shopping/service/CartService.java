@@ -1,100 +1,65 @@
 package org.objectworld.shopping.service;
 
-import org.objectworld.shopping.domain.Cart;
-import org.objectworld.shopping.domain.Customer;
-import org.objectworld.shopping.domain.enumeration.CartStatus;
-import org.objectworld.shopping.repository.CartRepository;
-import org.objectworld.shopping.repository.CustomerRepository;
-import org.objectworld.shopping.web.dto.CartDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.objectworld.shopping.domain.Cart;
+import org.objectworld.shopping.domain.Customer;
+import org.objectworld.shopping.domain.enumeration.CartStatus;
+import org.objectworld.shopping.dto.CartDto;
+import org.objectworld.shopping.repository.CartRepository;
+import org.objectworld.shopping.repository.CustomerRepository;
+import org.objectworld.util.ObjectMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Transactional
+@Slf4j
 public class CartService {
-
-    private final Logger log = LoggerFactory.getLogger(CartService.class);
-
     private final CartRepository cartRepository;
     private final CustomerRepository customerRepository;
-    private final OrderService orderService;
-
-    public CartService(CartRepository cartRepository, CustomerRepository customerRepository, OrderService orderService) {
+    
+    public CartService(CartRepository cartRepository, CustomerRepository customerRepository) {
         this.cartRepository = cartRepository;
         this.customerRepository = customerRepository;
-        this.orderService = orderService;
     }
 
     public static CartDto mapToDto(Cart cart) {
-        if (cart != null) {
-            return new CartDto(
-                    cart.getId(),
-                    cart.getCustomer().getId(),
-                    cart.getStatus().name()
-            );
-        }
-        return null;
+    	return ObjectMapper.map(cart, CartDto.class);
     }
 
+    @Transactional(readOnly = true)
     public List<CartDto> findAll() {
         log.debug("Request to get all Carts");
         return this.cartRepository.findAll()
-                .stream()
-                .map(CartService::mapToDto)
-                .collect(Collectors.toList());
+            .stream()
+            .map(CartService::mapToDto)
+            .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<CartDto> findAllActiveCarts() {
         return this.cartRepository.findByStatus(CartStatus.NEW)
-                .stream()
-                .map(CartService::mapToDto)
-                .collect(Collectors.toList());
-    }
-
-    public Cart create(Long customerId) {
-        if (this.getActiveCart(customerId) == null) {
-            Customer customer = this.customerRepository.findById(customerId)
-                    .orElseThrow(() -> new IllegalStateException("The Customer does not exist!"));
-
-            Cart cart = new Cart(
-                    customer,
-                    CartStatus.NEW
-            );
-
-            return this.cartRepository.save(cart);
-        } else {
-            throw new IllegalStateException("There is already an active cart");
-        }
-    }
-
-    public CartDto createDto(Long customerId) {
-        return mapToDto(this.create(customerId));
+            .stream()
+            .map(CartService::mapToDto)
+            .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public CartDto findById(Long id) {
         log.debug("Request to get Cart : {}", id);
-        return this.cartRepository.findById(id).map(CartService::mapToDto).orElse(null);
+        return this.cartRepository.findById(id)
+        	.map(CartService::mapToDto).orElse(null);
     }
 
-    public void delete(Long id) {
-        log.debug("Request to delete Cart : {}", id);
-        Cart cart = this.cartRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("Cannot find cart with id " + id));
-
-        cart.setStatus(CartStatus.CANCELED);
-
-        this.cartRepository.save(cart);
-    }
-
-    public CartDto getActiveCart(Long customerId) {
+    @Transactional(readOnly = true)
+    public CartDto findByCustomerId(Long customerId) {
+        log.debug("Request to get Active Cart with Customer : {}", customerId);
         List<Cart> carts = this.cartRepository
-                .findByStatusAndCustomerId(CartStatus.NEW, customerId);
+            .findByStatusAndCustomerId(CartStatus.NEW, customerId);
         if (carts != null) {
 
             if (carts.size() == 1) {
@@ -104,7 +69,33 @@ public class CartService {
                 throw new IllegalStateException("Many active carts detected !!!");
             }
         }
-
         return null;
+    }
+
+    public CartDto create(Long customerId) {
+        log.debug("Request to create Cart : {}", customerId);
+        if (this.findByCustomerId(customerId) == null) {
+            Customer customer = this.customerRepository.findById(customerId)
+                .orElseThrow(() -> new IllegalStateException("The Customer does not exist!"));
+
+            Cart cart = Cart.builder()
+            	.customer(customer)
+            	.status(CartStatus.NEW)
+            	.build();
+
+            return mapToDto(this.cartRepository.save(cart));
+        } else {
+            throw new IllegalStateException("There is already an active cart");
+        }
+    }
+
+    public void delete(Long id) {
+        log.debug("Request to delete Cart : {}", id);
+        Cart cart = this.cartRepository.findById(id)
+        	.orElseThrow(() -> new IllegalStateException("Cannot find cart id : " + id));
+
+        cart.setStatus(CartStatus.CANCELED);
+
+        this.cartRepository.save(cart);
     }
 }

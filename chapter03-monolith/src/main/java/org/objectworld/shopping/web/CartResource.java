@@ -1,7 +1,7 @@
 package org.objectworld.shopping.web;
 
+import org.objectworld.shopping.dto.CartDto;
 import org.objectworld.shopping.service.CartService;
-import org.objectworld.shopping.web.dto.CartDto;
 import org.springframework.web.bind.annotation.*;
 
 import static org.objectworld.shopping.common.Web.API;
@@ -33,7 +33,7 @@ public class CartResource {
 
     @GetMapping("/customer/{id}")
     public CartDto getActiveCartForCustomer(@PathVariable("id") Long customerId) {
-        return this.cartService.getActiveCart(customerId);
+        return this.cartService.findByCustomerId(customerId);
     }
 
     @GetMapping("/{id}")
@@ -43,7 +43,7 @@ public class CartResource {
 
     @PostMapping("/customer/{id}")
     public CartDto create(@PathVariable("id") Long customerId) {
-        return this.cartService.createDto(customerId);
+        return this.cartService.create(customerId);
     }
 
     @DeleteMapping("/{id}")

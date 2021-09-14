@@ -1,23 +1,22 @@
 package org.objectworld.shopping.service;
 
-import org.objectworld.shopping.domain.Category;
-import org.objectworld.shopping.repository.CategoryRepository;
-import org.objectworld.shopping.web.dto.CategoryDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.objectworld.shopping.domain.Category;
+import org.objectworld.shopping.dto.CategoryDto;
+import org.objectworld.shopping.repository.CategoryRepository;
+import org.objectworld.util.ObjectMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Transactional
+@Slf4j
 public class CategoryService {
-
-    private final Logger log = LoggerFactory.getLogger(CategoryService.class);
-
     private final CategoryRepository categoryRepository;
 
     public CategoryService(CategoryRepository categoryRepository) {
@@ -25,17 +24,18 @@ public class CategoryService {
     }
 
     public static CategoryDto mapToDto(Category category) {
-        if (category != null) {
-            return new CategoryDto(
-                    category.getId(),
-                    category.getName(),
-                    category.getDescription(),
-                    category.getProducts().size()
-            );
-        }
-        return null;
+    	CategoryDto categoryDto = ObjectMapper.map(category, CategoryDto.class);
+    	if(categoryDto != null) {
+    		categoryDto.setProductCount(category.getProducts().size());
+    	}
+    	return categoryDto;
     }
 
+    public static Category createFromDto(CategoryDto categoryDto) {
+    	return ObjectMapper.map(categoryDto, Category.class);
+    }
+
+    @Transactional(readOnly = true)
     public List<CategoryDto> findAll() {
         log.debug("Request to get all Categories");
         return this.categoryRepository.findAll()
@@ -47,19 +47,22 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public CategoryDto findById(Long id) {
         log.debug("Request to get Category : {}", id);
-        return this.categoryRepository.findById(id).map(CategoryService::mapToDto)
-                .orElseThrow(IllegalStateException::new);
+        return this.categoryRepository.findById(id)
+        		.map(CategoryService::mapToDto)
+        		.orElseThrow(IllegalStateException::new);
     }
 
     public CategoryDto create(CategoryDto categoryDto) {
         log.debug("Request to create Category : {}", categoryDto);
-        return mapToDto(this.categoryRepository.save(
-                new Category(
-                        categoryDto.getName(),
-                        categoryDto.getDescription(),
-                        Collections.emptySet()
-                )
-        ));
+//        return mapToDto(this.categoryRepository.save(
+//                Category.builder()
+//                	.name(categoryDto.getName())
+//                	.description(categoryDto.getDescription())
+//                	.products(Collections.emptySet())
+//                	.build()
+//                )
+//        );
+        return mapToDto(this.categoryRepository.save(createFromDto(categoryDto)));
     }
 
     public void delete(Long id) {

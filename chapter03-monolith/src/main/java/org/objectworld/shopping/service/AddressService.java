@@ -1,35 +1,19 @@
 package org.objectworld.shopping.service;
 
 import org.objectworld.shopping.domain.Address;
-import org.objectworld.shopping.web.dto.AddressDto;
+import org.objectworld.shopping.dto.AddressDto;
+import org.objectworld.util.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AddressService {
 
     public static AddressDto mapToDto(Address address) {
-        if (address != null) {
-            return new AddressDto(
-                    address.getAddress1(),
-                    address.getAddress2(),
-                    address.getCity(),
-                    address.getPostcode(),
-                    address.getCountry()
-            );
-        }
-        return null;
+    	return ObjectMapper.map(address, AddressDto.class);
     }
 
     public static Address createFromDto(AddressDto addressDto) {
-        if (addressDto != null) {
-            return new Address(
-                    addressDto.getAddress1(),
-                    addressDto.getAddress2(),
-                    addressDto.getCity(),
-                    addressDto.getPostcode(),
-                    addressDto.getCountry()
-            );
-        }
-        return null;
+        return ObjectMapper.map(addressDto, Address.class);
     }
 }
+	
